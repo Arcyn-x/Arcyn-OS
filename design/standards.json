@@ -1,0 +1,170 @@
+{
+  "naming_conventions": {
+    "modules": {
+      "pattern": "snake_case",
+      "description": "Module files use snake_case (e.g., memory_manager.py)",
+      "examples": [
+        "memory_manager.py",
+        "context_manager.py",
+        "task_graph.py"
+      ]
+    },
+    "classes": {
+      "pattern": "PascalCase",
+      "description": "Classes use PascalCase (e.g., MemoryManager)",
+      "examples": [
+        "MemoryManager",
+        "ContextManager",
+        "TaskGraph"
+      ]
+    },
+    "functions": {
+      "pattern": "snake_case",
+      "description": "Functions use snake_case (e.g., read_memory)",
+      "examples": [
+        "read_memory",
+        "write_context",
+        "validate_task"
+      ]
+    },
+    "constants": {
+      "pattern": "UPPER_SNAKE_CASE",
+      "description": "Constants use UPPER_SNAKE_CASE (e.g., MAX_SIZE)",
+      "examples": [
+        "MAX_SIZE",
+        "DEFAULT_TIMEOUT",
+        "API_VERSION"
+      ]
+    },
+    "agents": {
+      "pattern": "PascalCase with Agent suffix",
+      "description": "Agent classes end with 'Agent' (e.g., ArchitectAgent)",
+      "examples": [
+        "ArchitectAgent",
+        "BuilderAgent",
+        "SystemDesignerAgent"
+      ]
+    }
+  },
+  "folder_structure": {
+    "core": {
+      "path": "core/",
+      "description": "Core system modules",
+      "allowed_files": [
+        "*.py"
+      ],
+      "required_files": [
+        "__init__.py"
+      ]
+    },
+    "agents": {
+      "path": "agents/{agent_name}/",
+      "description": "Agent implementations",
+      "allowed_files": [
+        "*.py"
+      ],
+      "required_files": [
+        "__init__.py",
+        "{agent_name}_agent.py"
+      ]
+    },
+    "design": {
+      "path": "design/",
+      "description": "Design artifacts and documentation",
+      "allowed_files": [
+        "*.json",
+        "*.md",
+        "*.yaml",
+        "*.yml"
+      ]
+    },
+    "backups": {
+      "path": "backups/",
+      "description": "File backups",
+      "allowed_files": [
+        "*.py",
+        "*.json"
+      ]
+    }
+  },
+  "module_interfaces": {
+    "required_exports": {
+      "description": "All modules must export public API via __all__",
+      "pattern": "__all__ = ['Class1', 'Class2', 'function1']"
+    },
+    "docstrings": {
+      "required": true,
+      "format": "Google style",
+      "description": "All public classes and functions must have docstrings"
+    },
+    "type_hints": {
+      "required": true,
+      "description": "All function signatures must include type hints"
+    }
+  },
+  "versioning": {
+    "semantic_versioning": {
+      "pattern": "MAJOR.MINOR.PATCH",
+      "description": "Use semantic versioning (e.g., 1.2.3)",
+      "breaking_changes": "Increment MAJOR",
+      "new_features": "Increment MINOR",
+      "bug_fixes": "Increment PATCH"
+    },
+    "agent_versioning": {
+      "format": "{agent_id}_v{version}",
+      "example": "architect_agent_v1.0.0"
+    }
+  },
+  "deprecation_policy": {
+    "notice_period": "2 minor versions",
+    "description": "Deprecated features must be announced 2 minor versions before removal",
+    "warnings": {
+      "required": true,
+      "format": "DeprecationWarning in code and documentation"
+    },
+    "migration_guide": {
+      "required": true,
+      "description": "Must provide migration guide for deprecated features"
+    }
+  },
+  "code_quality": {
+    "linter": {
+      "required": true,
+      "tools": [
+        "pylint",
+        "flake8",
+        "mypy"
+      ],
+      "max_complexity": 10
+    },
+    "test_coverage": {
+      "minimum": 0.8,
+      "description": "Minimum 80% test coverage required"
+    },
+    "documentation": {
+      "required": true,
+      "format": "Docstrings + README.md per module"
+    }
+  },
+  "agent_interaction": {
+    "message_format": {
+      "type": "JSON",
+      "required_fields": [
+        "action",
+        "agent_id",
+        "timestamp",
+        "data"
+      ],
+      "description": "All agent-to-agent communication uses JSON"
+    },
+    "error_handling": {
+      "required": true,
+      "format": "Structured error responses with error codes"
+    },
+    "async_support": {
+      "current": false,
+      "future": true,
+      "description": "Future versions will support async operations"
+    }
+  }
+}

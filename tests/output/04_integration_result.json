@@ -1,0 +1,146 @@
+{
+  "status": "blocked",
+  "violations": [
+    "Task name violation: Function name 'Requirements Analysis' violates snake_case convention",
+    "Task name violation: Function name 'Architecture Design' violates snake_case convention",
+    "Task name violation: Function name 'Technology Stack Selection' violates snake_case convention",
+    "Task name violation: Function name 'Setup Development Environment' violates snake_case convention",
+    "Task name violation: Function name 'Implement Core Components' violates snake_case convention",
+    "Task name violation: Function name 'Implement Supporting Features' violates snake_case convention",
+    "Task name violation: Function name 'Unit Testing' violates snake_case convention",
+    "Task name violation: Function name 'Integration Testing' violates snake_case convention",
+    "Task name violation: Function name 'System Testing' violates snake_case convention",
+    "Task name violation: Function name 'Deployment Configuration' violates snake_case convention",
+    "Task name violation: Function name 'Deploy to Production' violates snake_case convention",
+    "Task name violation: Function name 'Create Documentation' violates snake_case convention"
+  ],
+  "warnings": [
+    "Violation: task_1 (task_1) depends on task_5 (task_5). Allowed directions from task_1: []",
+    "Violation: task_1 (task_1) depends on task_4 (task_4). Allowed directions from task_1: []",
+    "Violation: task_1 (task_1) depends on task_6 (task_6). Allowed directions from task_1: []",
+    "Violation: task_2 (task_2) depends on task_5 (task_5). Allowed directions from task_2: []",
+    "Violation: task_2 (task_2) depends on task_4 (task_4). Allowed directions from task_2: []",
+    "Violation: task_2 (task_2) depends on task_6 (task_6). Allowed directions from task_2: []",
+    "Violation: task_3 (task_3) depends on task_5 (task_5). Allowed directions from task_3: []",
+    "Violation: task_3 (task_3) depends on task_4 (task_4). Allowed directions from task_3: []",
+    "Violation: task_3 (task_3) depends on task_6 (task_6). Allowed directions from task_3: []",
+    "Violation: task_4 (task_4) depends on task_9 (task_9). Allowed directions from task_4: []",
+    "Violation: task_4 (task_4) depends on task_7 (task_7). Allowed directions from task_4: []",
+    "Violation: task_4 (task_4) depends on task_8 (task_8). Allowed directions from task_4: []",
+    "Violation: task_5 (task_5) depends on task_9 (task_9). Allowed directions from task_5: []",
+    "Violation: task_5 (task_5) depends on task_7 (task_7). Allowed directions from task_5: []",
+    "Violation: task_5 (task_5) depends on task_8 (task_8). Allowed directions from task_5: []",
+    "Violation: task_6 (task_6) depends on task_9 (task_9). Allowed directions from task_6: []",
+    "Violation: task_6 (task_6) depends on task_7 (task_7). Allowed directions from task_6: []",
+    "Violation: task_6 (task_6) depends on task_8 (task_8). Allowed directions from task_6: []",
+    "Violation: task_7 (task_7) depends on task_10 (task_10). Allowed directions from task_7: []",
+    "Violation: task_7 (task_7) depends on task_11 (task_11). Allowed directions from task_7: []",
+    "Violation: task_7 (task_7) depends on task_12 (task_12). Allowed directions from task_7: []",
+    "Violation: task_8 (task_8) depends on task_10 (task_10). Allowed directions from task_8: []",
+    "Violation: task_8 (task_8) depends on task_11 (task_11). Allowed directions from task_8: []",
+    "Violation: task_8 (task_8) depends on task_12 (task_12). Allowed directions from task_8: []",
+    "Violation: task_9 (task_9) depends on task_10 (task_10). Allowed directions from task_9: []",
+    "Violation: task_9 (task_9) depends on task_11 (task_11). Allowed directions from task_9: []",
+    "Violation: task_9 (task_9) depends on task_12 (task_12). Allowed directions from task_9: []",
+    "Builder created files for modules not in design: {'memory_test_b4f00752'}"
+  ],
+  "actions_required": [
+    "Fix all violations before integration",
+    "Review warnings before proceeding"
+  ],
+  "integration_summary": "Integration blocked. 12 violation(s) prevent integration.",
+  "validation_details": {
+    "contract_validation": {
+      "architect_plan_valid": true,
+      "system_design_valid": true,
+      "builder_output_valid": true,
+      "contracts_valid": null
+    },
+    "dependency_check": {
+      "architecture": {
+        "valid": true,
+        "circular_dependencies": [],
+        "layer_violations": [],
+        "missing_dependencies": [],
+        "warnings": []
+      },
+      "task_graph": {
+        "valid": false,
+        "circular_dependencies": [],
+        "layer_violations": [
+          "Violation: task_1 (task_1) depends on task_5 (task_5). Allowed directions from task_1: []",
+          "Violation: task_1 (task_1) depends on task_4 (task_4). Allowed directions from task_1: []",
+          "Violation: task_1 (task_1) depends on task_6 (task_6). Allowed directions from task_1: []",
+          "Violation: task_2 (task_2) depends on task_5 (task_5). Allowed directions from task_2: []",
+          "Violation: task_2 (task_2) depends on task_4 (task_4). Allowed directions from task_2: []",
+          "Violation: task_2 (task_2) depends on task_6 (task_6). Allowed directions from task_2: []",
+          "Violation: task_3 (task_3) depends on task_5 (task_5). Allowed directions from task_3: []",
+          "Violation: task_3 (task_3) depends on task_4 (task_4). Allowed directions from task_3: []",
+          "Violation: task_3 (task_3) depends on task_6 (task_6). Allowed directions from task_3: []",
+          "Violation: task_4 (task_4) depends on task_9 (task_9). Allowed directions from task_4: []",
+          "Violation: task_4 (task_4) depends on task_7 (task_7). Allowed directions from task_4: []",
+          "Violation: task_4 (task_4) depends on task_8 (task_8). Allowed directions from task_4: []",
+          "Violation: task_5 (task_5) depends on task_9 (task_9). Allowed directions from task_5: []",
+          "Violation: task_5 (task_5) depends on task_7 (task_7). Allowed directions from task_5: []",
+          "Violation: task_5 (task_5) depends on task_8 (task_8). Allowed directions from task_5: []",
+          "Violation: task_6 (task_6) depends on task_9 (task_9). Allowed directions from task_6: []",
+          "Violation: task_6 (task_6) depends on task_7 (task_7). Allowed directions from task_6: []",
+          "Violation: task_6 (task_6) depends on task_8 (task_8). Allowed directions from task_6: []",
+          "Violation: task_7 (task_7) depends on task_10 (task_10). Allowed directions from task_7: []",
+          "Violation: task_7 (task_7) depends on task_11 (task_11). Allowed directions from task_7: []",
+          "Violation: task_7 (task_7) depends on task_12 (task_12). Allowed directions from task_7: []",
+          "Violation: task_8 (task_8) depends on task_10 (task_10). Allowed directions from task_8: []",
+          "Violation: task_8 (task_8) depends on task_11 (task_11). Allowed directions from task_8: []",
+          "Violation: task_8 (task_8) depends on task_12 (task_12). Allowed directions from task_8: []",
+          "Violation: task_9 (task_9) depends on task_10 (task_10). Allowed directions from task_9: []",
+          "Violation: task_9 (task_9) depends on task_11 (task_11). Allowed directions from task_9: []",
+          "Violation: task_9 (task_9) depends on task_12 (task_12). Allowed directions from task_9: []"
+        ],
+        "missing_dependencies": [
+          "task_10",
+          "task_11",
+          "task_12"
+        ],
+        "warnings": [
+          "Referenced dependencies that are not defined: {'task_10', 'task_11', 'task_12'}"
+        ]
+      }
+    },
+    "standards_enforcement": {
+      "architect_plan": {
+        "valid": false,
+        "violations": [
+          "Task name violation: Function name 'Requirements Analysis' violates snake_case convention",
+          "Task name violation: Function name 'Architecture Design' violates snake_case convention",
+          "Task name violation: Function name 'Technology Stack Selection' violates snake_case convention",
+          "Task name violation: Function name 'Setup Development Environment' violates snake_case convention",
+          "Task name violation: Function name 'Implement Core Components' violates snake_case convention",
+          "Task name violation: Function name 'Implement Supporting Features' violates snake_case convention",
+          "Task name violation: Function name 'Unit Testing' violates snake_case convention",
+          "Task name violation: Function name 'Integration Testing' violates snake_case convention",
+          "Task name violation: Function name 'System Testing' violates snake_case convention",
+          "Task name violation: Function name 'Deployment Configuration' violates snake_case convention",
+          "Task name violation: Function name 'Deploy to Production' violates snake_case convention",
+          "Task name violation: Function name 'Create Documentation' violates snake_case convention"
+        ],
+        "warnings": []
+      },
+      "system_design": {
+        "valid": true,
+        "violations": [],
+        "warnings": []
+      },
+      "builder_output": {
+        "valid": true,
+        "violations": [],
+        "warnings": []
+      }
+    },
+    "cross_validation": {
+      "inconsistencies": [
+        "Builder created files for modules not in design: {'memory_test_b4f00752'}"
+      ],
+      "valid": false
+    }
+  }
+}

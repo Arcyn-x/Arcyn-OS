@@ -1,0 +1,6 @@
+{
+    "action": "build",
+    "description": "Create a new module",
+    "target_path": "core/test_module.py",
+    "content": "# Test module"
+}

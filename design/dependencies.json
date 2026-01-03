@@ -1,0 +1,15 @@
+{
+  "nodes": [],
+  "edges": [],
+  "metadata": {
+    "total_modules": 0,
+    "total_dependencies": 0,
+    "has_circular_dependencies": false
+  },
+  "circular_dependencies": [],
+  "layer_validation": {
+    "valid": true,
+    "violations": []
+  },
+  "topological_order": []
+}
