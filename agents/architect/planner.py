@@ -2,9 +2,10 @@
 Planner module for Architect Agent.
 
 Converts high-level goals into structured plans with milestones and tasks.
+Supports both rule-based and LLM-powered planning.
 """
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import re
 
 
@@ -12,15 +13,24 @@ class Planner:
     """
     Plans development tasks from high-level goals.
     
-    TODO: Integrate with LLM for intelligent goal decomposition
-    TODO: Add domain-specific planning rules
-    TODO: Implement plan optimization
-    TODO: Add plan validation and conflict detection
+    Supports two modes:
+    1. Rule-based: Fast, deterministic planning (plan method)
+    2. LLM-powered: Intelligent planning via gateway (plan_with_llm method)
+    
+    All LLM calls route through the central gateway.
     """
     
-    def __init__(self):
-        """Initialize the planner."""
+    def __init__(self, agent_name: str = "Architect"):
+        """
+        Initialize the planner.
+        
+        Args:
+            agent_name: Agent identifier for gateway routing
+        """
+        self.agent_name = agent_name
         self.planning_rules = self._load_default_rules()
+        self._use_llm = True  # Enable LLM by default
+
     
     def _load_default_rules(self) -> Dict[str, Any]:
         """
@@ -397,4 +407,129 @@ class Planner:
             return 'medium'
         else:
             return 'high'
+    
+    # =========================================================================
+    # LLM-Powered Planning
+    # =========================================================================
+    
+    def plan_with_llm(
+        self,
+        goal: str,
+        context: Optional[Dict[str, Any]] = None,
+        task_id: str = "plan"
+    ) -> Dict[str, Any]:
+        """
+        Create a comprehensive plan using LLM.
+        
+        Uses the LLM Gateway for intelligent goal decomposition,
+        technology decisions, and task generation.
+        
+        Args:
+            goal: High-level goal description
+            context: Optional context (existing code, constraints, etc.)
+            task_id: Task identifier for tracking
+        
+        Returns:
+            Dictionary containing:
+            {
+                "goal": str,
+                "decisions": {...},
+                "rejected_options": [...],
+                "milestones": [...],
+                "tasks": [...],
+                "execution_order": [...],
+                "architectural_constraints": [...],
+                "open_questions": [...]
+            }
+        """
+        if not self._use_llm:
+            # Fall back to rule-based if LLM disabled
+            return self.plan(goal)
+        
+        try:
+            from core.llm_gateway import request_structured
+            
+            # Build the prompt
+            context_str = ""
+            if context:
+                import json
+                context_str = f"\nContext:\n{json.dumps(context, indent=2)}"
+            
+            prompt = f"""You are the Architect Agent (A-1) of Arcyn OS.
 
+Create a comprehensive development plan for this goal:
+
+Goal: {goal}
+{context_str}
+
+Requirements:
+1. Technology decisions with clear reasoning
+2. Rejected alternatives and why
+3. 3-5 milestones with descriptions
+4. Tasks for each milestone with dependencies
+5. Execution order
+6. Architectural constraints for Builders
+7. Open questions needing clarification
+
+Output JSON:
+{{
+  "goal": "...",
+  "decisions": {{
+    "framework": {{"choice": "...", "reasoning": "..."}},
+    "database": {{"choice": "...", "reasoning": "..."}}
+  }},
+  "rejected_options": [
+    {{"category": "...", "option": "...", "reason": "..."}}
+  ],
+  "milestones": [
+    {{"id": "M1", "name": "...", "description": "...", "tasks": ["T1", "T2"]}}
+  ],
+  "tasks": [
+    {{"id": "T1", "name": "...", "description": "...", "milestone_id": "M1", "dependencies": [], "effort": "low|medium|high"}}
+  ],
+  "execution_order": ["T1", "T2", "..."],
+  "architectural_constraints": ["..."],
+  "open_questions": ["..."]
+}}"""
+            
+            response = request_structured(
+                agent=self.agent_name,
+                task_id=task_id,
+                prompt=prompt,
+                schema={
+                    "goal": "",
+                    "decisions": {},
+                    "milestones": [],
+                    "tasks": [],
+                    "execution_order": []
+                },
+                config={"max_tokens": 4000, "temperature": 0.5}
+            )
+            
+            if response.success and response.parsed_json:
+                result = response.parsed_json
+                result["source"] = "llm"
+                result["metadata"] = {
+                    "total_milestones": len(result.get("milestones", [])),
+                    "total_tasks": len(result.get("tasks", [])),
+                    "request_id": response.request_id,
+                    "tokens_used": response.tokens_total
+                }
+                return result
+            
+            # Fall back to rule-based on failure
+            return self.plan(goal)
+            
+        except Exception as e:
+            # Fall back to rule-based on exception
+            result = self.plan(goal)
+            result["llm_error"] = str(e)
+            return result
+    
+    def enable_llm(self) -> None:
+        """Enable LLM-powered planning."""
+        self._use_llm = True
+    
+    def disable_llm(self) -> None:
+        """Disable LLM planning (rule-based only)."""
+        self._use_llm = False

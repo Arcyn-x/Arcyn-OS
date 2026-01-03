@@ -285,11 +285,135 @@ class Analyzer:
             "bottlenecks": len(bottlenecks), "debt_items": len(debt), "health": health
         }
     
-    # TODO: LLM Hooks (GATED - requires explicit approval)
+    # =========================================================================
+    # LLM-Powered Analysis
+    # =========================================================================
+    
+    def analyze_with_llm(
+        self,
+        observations: Dict[str, Any],
+        task_id: str = "analyze"
+    ) -> Dict[str, Any]:
+        """
+        Perform strategic analysis using LLM.
+        
+        Combines rule-based analysis with LLM insights for
+        deeper pattern recognition and recommendations.
+        
+        Args:
+            observations: System observations
+            task_id: Task identifier for tracking
+        
+        Returns:
+            Enhanced analysis with LLM insights
+        """
+        # First, do rule-based analysis
+        base_analysis = self.analyze(observations)
+        
+        # Then enhance with LLM
+        try:
+            from core.llm_gateway import request_structured
+            import json
+            
+            # Build observation summary for LLM
+            obs_summary = {
+                "issues_count": len(base_analysis.get("issues", [])),
+                "issues": base_analysis.get("issues", [])[:5],  # Top 5 issues
+                "patterns": base_analysis.get("patterns", {}),
+                "bottlenecks": base_analysis.get("bottlenecks", []),
+                "technical_debt": base_analysis.get("technical_debt", [])[:5],
+                "health": base_analysis.get("summary", {}).get("health", "unknown")
+            }
+            
+            prompt = f"""You are the Evolution Agent (S-3) of Arcyn OS.
+
+Analyze this system observation and provide strategic recommendations:
+
+Observation:
+{json.dumps(obs_summary, indent=2)}
+
+Provide a thorough analysis including:
+1. Architectural risks and concerns
+2. Performance inefficiencies
+3. Scalability limits
+4. Maintenance forecast (6 months)
+5. Strategic recommendations with priority and effort
+
+Be critical and strategic, not just safe observations.
+
+Output JSON:
+{{
+  "risks": [
+    {{
+      "component": "...",
+      "issue": "...",
+      "impact": "...",
+      "recommendation": "...",
+      "risk_level": "low|medium|high|critical",
+      "effort_to_fix": "low|medium|high"
+    }}
+  ],
+  "inefficiencies": ["..."],
+  "architectural_concerns": ["..."],
+  "scalability_limits": ["..."],
+  "maintenance_forecast": {{
+    "6_months": "...",
+    "risk_trajectory": "stable|increasing|decreasing"
+  }},
+  "suggested_changes": [
+    {{
+      "title": "...",
+      "scope": "...",
+      "risk": "low|medium|high",
+      "effort": "low|medium|high",
+      "priority": "low|medium|high",
+      "rationale": "..."
+    }}
+  ],
+  "confidence": 0.85
+}}"""
+            
+            response = request_structured(
+                agent="Evolution",
+                task_id=task_id,
+                prompt=prompt,
+                schema={
+                    "risks": [],
+                    "suggested_changes": [],
+                    "confidence": 0.0
+                },
+                config={"max_tokens": 2000, "temperature": 0.5}
+            )
+            
+            if response.success and response.parsed_json:
+                llm_insights = response.parsed_json
+                
+                # Merge LLM insights into base analysis
+                base_analysis["llm_insights"] = {
+                    "risks": llm_insights.get("risks", []),
+                    "inefficiencies": llm_insights.get("inefficiencies", []),
+                    "architectural_concerns": llm_insights.get("architectural_concerns", []),
+                    "scalability_limits": llm_insights.get("scalability_limits", []),
+                    "maintenance_forecast": llm_insights.get("maintenance_forecast", {}),
+                    "suggested_changes": llm_insights.get("suggested_changes", []),
+                    "confidence": llm_insights.get("confidence", 0.0)
+                }
+                base_analysis["source"] = "rule_based+llm"
+                base_analysis["metadata"] = {
+                    "request_id": response.request_id,
+                    "tokens_used": response.tokens_total
+                }
+        
+        except Exception as e:
+            base_analysis["llm_error"] = str(e)
+            base_analysis["source"] = "rule_based"
+        
+        return base_analysis
+    
     def _llm_analyze_patterns(self, observations: Dict[str, Any]) -> Dict[str, Any]:
-        """TODO: LLM-based pattern detection."""
+        """LLM-based pattern detection - implemented via analyze_with_llm."""
         return {}
     
     def _llm_suggest_root_causes(self, issues: List) -> List[Dict[str, Any]]:
-        """TODO: LLM-based root cause analysis."""
+        """LLM-based root cause analysis - implemented via analyze_with_llm."""
         return []
