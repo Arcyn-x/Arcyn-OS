@@ -1,0 +1,23 @@
+{
+  "recommendation": {
+    "type": "refactor",
+    "target": "big_module.py",
+    "description": "Major refactor",
+    "priority": "high"
+  },
+  "plan": [
+    {
+      "step": 1,
+      "action": "backup",
+      "description": "Create backup of big_module.py",
+      "reversible": true
+    },
+    {
+      "step": 2,
+      "action": "analyze",
+      "description": "AST-analyze big_module.py for refactoring opportunities",
+      "reversible": true
+    }
+  ],
+  "status": "awaiting_review"
+}

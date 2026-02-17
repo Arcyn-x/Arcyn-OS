@@ -1,0 +1,24 @@
+# =============================================================================
+# Arcyn OS - Python Dependencies
+# =============================================================================
+# Install: pip install -r requirements.txt
+# Dev:     pip install -r requirements.txt -r requirements-dev.txt
+# =============================================================================
+
+# Core LLM Provider
+google-genai>=1.0.0
+
+# Environment Management
+python-dotenv>=1.0.0
+
+# Database (Knowledge Engine)
+# SQLite is built-in; no extra deps needed for basic persistence
+
+# Async Support (future)
+# aiohttp>=3.9.0
+# aiofiles>=23.2.0
+
+# API Server
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+pydantic>=2.0.0

@@ -1,0 +1,89 @@
+{
+  "goal": "Test goal",
+  "status": "completed",
+  "started_at": "2026-02-11T03:13:07.086503",
+  "completed_at": "2026-02-11T03:13:14.294054",
+  "total_duration_ms": 7207.41081237793,
+  "error": null,
+  "stages": [
+    {
+      "name": "classify",
+      "agent_id": "S-1",
+      "description": "Intent classification & routing",
+      "status": "completed",
+      "duration_ms": 7187.113523483276,
+      "started_at": "2026-02-11T03:13:07.086647",
+      "completed_at": "2026-02-11T03:13:14.273767",
+      "error": null
+    },
+    {
+      "name": "plan",
+      "agent_id": "A-1",
+      "description": "Goal \u2192 structured plan",
+      "status": "completed",
+      "duration_ms": 1.2042522430419922,
+      "started_at": "2026-02-11T03:13:14.273778",
+      "completed_at": "2026-02-11T03:13:14.274987",
+      "error": null
+    },
+    {
+      "name": "build",
+      "agent_id": "F-1",
+      "description": "Plan \u2192 code generation",
+      "status": "completed",
+      "duration_ms": 1.6226768493652344,
+      "started_at": "2026-02-11T03:13:14.274996",
+      "completed_at": "2026-02-11T03:13:14.276622",
+      "error": null
+    },
+    {
+      "name": "validate",
+      "agent_id": "F-2",
+      "description": "Architectural validation",
+      "status": "completed",
+      "duration_ms": 0.32806396484375,
+      "started_at": "2026-02-11T03:13:14.276631",
+      "completed_at": "2026-02-11T03:13:14.276962",
+      "error": null
+    },
+    {
+      "name": "integrate",
+      "agent_id": "F-3",
+      "description": "Compatibility & standards check",
+      "status": "completed",
+      "duration_ms": 1.4469623565673828,
+      "started_at": "2026-02-11T03:13:14.276969",
+      "completed_at": "2026-02-11T03:13:14.278420",
+      "error": null
+    },
+    {
+      "name": "store",
+      "agent_id": "S-2",
+      "description": "Knowledge storage & indexing",
+      "status": "completed",
+      "duration_ms": 0.4436969757080078,
+      "started_at": "2026-02-11T03:13:14.278428",
+      "completed_at": "2026-02-11T03:13:14.278876",
+      "error": null
+    },
+    {
+      "name": "review",
+      "agent_id": "S-3",
+      "description": "Strategic analysis & recommendations",
+      "status": "completed",
+      "duration_ms": 14.934301376342773,
+      "started_at": "2026-02-11T03:13:14.278885",
+      "completed_at": "2026-02-11T03:13:14.293825",
+      "error": null
+    }
+  ],
+  "outputs": {
+    "classification": "{'response': 'Available Commands:\\n\\n  build        - Create or scaffold code files (builder agent)\\n  design       - Design system architecture (system_designer agent)\\n  integrate    - Validate and integrate agent outputs (integrator agent)\\n  status       - Check system or agent status (architect agent)\\n\\nExamples:\\n  build \"Create a memory module\"\\n  design \"Design Arcyn OS kernel\"\\n  status\\n  help', 'intent': {'intent': 'help', 'entities': {}, 'confidence': 0.1, 'assumptions': [], 'missin",
+    "plan": "{'goal': 'Test goal', 'milestones': [{'id': 'milestone_1', 'name': 'Planning & Design', 'description': 'Define architecture, requirements, and design specifications', 'status': 'pending', 'order': 1}, {'id': 'milestone_2', 'name': 'Core Implementation', 'description': 'Implement core functionality and features', 'status': 'pending', 'order': 2}, {'id': 'milestone_3', 'name': 'Integration & Testing', 'description': 'Integrate components and perform testing', 'status': 'pending', 'order': 3}, {'id",
+    "build": "{'action': 'build', 'files_changed': [], 'summary': 'Built 0 file(s) from 12 task(s)', 'warnings': ['No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified', 'No target_path specified'], 'task_results': [{'task_id': 'task_1', 'status': 'completed', '",
+    "validation": "{'valid': True, 'errors': [], 'warnings': ['No layers defined in architecture'], 'recommendations': ['Architecture structure is valid', 'Consider defining modules for better organization']}",
+    "integration": "{'status': 'blocked', 'violations': ['System design: Missing required field: architecture', 'System design: Missing required field: modules', 'System design: Missing required field: standards', 'System design: Missing required field: dependencies', \"Task name violation: Function name 'Requirements Analysis' violates snake_case convention\", \"Task name violation: Function name 'Architecture Design' violates snake_case convention\", \"Task name violation: Function name 'Technology Stack Selection' vi",
+    "knowledge": "{'success': False, 'record_id': None, 'error': 'Missing required fields: source_agent'}",
+    "review": "{'recommendations': [{'rec_id': 'rec_00001', 'title': 'Optimize performance of persona', 'description': 'Address issue: Avg response 7187ms exceeds 2x threshold', 'recommendation_type': 'optimization', 'scope': 'Affects 1 component(s): persona', 'risk': 'low', 'effort': 'medium', 'priority': 'high', 'confidence': 0.8, 'rationale': \"Issue severity: high. Evidence: ['Avg: 7187ms', 'Threshold: 1000ms']\", 'affected_components': ['persona'], 'dependencies': [], 'prerequisites': [], 'expected_benefits"
+  }
+}

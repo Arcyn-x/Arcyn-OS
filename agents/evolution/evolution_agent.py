@@ -390,38 +390,345 @@ class EvolutionAgent:
         self.logger.debug(f"Recorded activity: {agent_id}.{action} = {status}")
     
     # ------------------------------------------------------------------
-    # TODO: Future Autonomy Hooks (EXPLICITLY GATED)
+    # Autonomy Hooks (EXPLICITLY GATED)
     # ------------------------------------------------------------------
-    
-    def _auto_remediate(self, recommendation: Dict[str, Any]) -> None:
+
+    def _auto_remediate(
+        self,
+        recommendation: Dict[str, Any],
+        config: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
-        TODO: Automatically implement a recommendation.
-        
-        GATED: This feature requires explicit approval and is disabled
-        by default. When enabled, it would:
-        - Generate code patches
-        - Submit for approval
-        - Apply after human review
-        
-        Currently a no-op stub.
+        Generate a remediation plan from a recommendation.
+
+        GATED: This feature requires `explicit_approval=True` in config.
+        Even when enabled, it only produces a remediation plan — it does
+        NOT apply changes directly. All patches are queued for human review.
+
+        Args:
+            recommendation: A single recommendation dict with at least:
+                - type: e.g. "refactor", "fix", "upgrade"
+                - description: What needs to change
+                - target: File or module path
+                - priority: low | medium | high
+            config: Optional config overriding defaults. Keys:
+                - explicit_approval: bool (must be True)
+                - dry_run: bool (default True)
+                - max_patches: int (default 5)
+
+        Returns:
+            Dictionary containing:
+            {
+                "approved": bool,
+                "plan": List[Dict],   # ordered remediation steps
+                "patches_queued": int,
+                "status": str,        # "queued" | "rejected" | "disabled"
+                "reason": str
+            }
         """
-        # TODO: Implement auto-remediation
-        # REQUIRES: explicit_approval=True in config
-        # REQUIRES: human review before any changes
-        self.logger.warning("Auto-remediation is disabled (advisory-only mode)")
-        pass
-    
-    def _continuous_monitoring(self) -> None:
+        config = config or {}
+        result = {
+            "approved": False,
+            "plan": [],
+            "patches_queued": 0,
+            "status": "disabled",
+            "reason": ""
+        }
+
+        # Gate check
+        if not config.get("explicit_approval", False):
+            result["reason"] = "Auto-remediation requires explicit_approval=True in config"
+            self.logger.warning(result["reason"])
+            return result
+
+        self.logger.info("Auto-remediation approved — generating plan")
+        self.context.set_state('remediating')
+
+        try:
+            rec_type = recommendation.get("type", "unknown")
+            target = recommendation.get("target", "unknown")
+            description = recommendation.get("description", "")
+            priority = recommendation.get("priority", "low")
+
+            # Build remediation plan based on recommendation type
+            plan_steps = []
+
+            if rec_type == "refactor":
+                plan_steps = [
+                    {
+                        "step": 1,
+                        "action": "backup",
+                        "description": f"Create backup of {target}",
+                        "reversible": True
+                    },
+                    {
+                        "step": 2,
+                        "action": "analyze",
+                        "description": f"AST-analyze {target} for refactoring opportunities",
+                        "reversible": True
+                    },
+                    {
+                        "step": 3,
+                        "action": "generate_patch",
+                        "description": f"Generate refactoring patch: {description}",
+                        "reversible": True
+                    },
+                    {
+                        "step": 4,
+                        "action": "validate",
+                        "description": "Run syntax validation and tests on patch",
+                        "reversible": True
+                    },
+                    {
+                        "step": 5,
+                        "action": "queue_for_review",
+                        "description": "Submit patch for human review",
+                        "reversible": True
+                    }
+                ]
+            elif rec_type == "fix":
+                plan_steps = [
+                    {
+                        "step": 1,
+                        "action": "diagnose",
+                        "description": f"Identify root cause in {target}",
+                        "reversible": True
+                    },
+                    {
+                        "step": 2,
+                        "action": "generate_fix",
+                        "description": f"Generate fix: {description}",
+                        "reversible": True
+                    },
+                    {
+                        "step": 3,
+                        "action": "test",
+                        "description": "Run regression tests against fix",
+                        "reversible": True
+                    },
+                    {
+                        "step": 4,
+                        "action": "queue_for_review",
+                        "description": "Submit fix for human review",
+                        "reversible": True
+                    }
+                ]
+            elif rec_type == "upgrade":
+                plan_steps = [
+                    {
+                        "step": 1,
+                        "action": "compatibility_check",
+                        "description": f"Check upgrade compatibility for {target}",
+                        "reversible": True
+                    },
+                    {
+                        "step": 2,
+                        "action": "generate_migration",
+                        "description": f"Generate migration plan: {description}",
+                        "reversible": True
+                    },
+                    {
+                        "step": 3,
+                        "action": "queue_for_review",
+                        "description": "Submit migration for human review",
+                        "reversible": True
+                    }
+                ]
+            else:
+                plan_steps = [
+                    {
+                        "step": 1,
+                        "action": "evaluate",
+                        "description": f"Evaluate recommendation: {description}",
+                        "reversible": True
+                    },
+                    {
+                        "step": 2,
+                        "action": "queue_for_review",
+                        "description": "Submit evaluation for human review",
+                        "reversible": True
+                    }
+                ]
+
+            # Enforce max patches
+            max_patches = config.get("max_patches", 5)
+            plan_steps = plan_steps[:max_patches]
+
+            result["approved"] = True
+            result["plan"] = plan_steps
+            result["patches_queued"] = len(plan_steps)
+            result["status"] = "queued"
+            result["reason"] = f"Plan generated for {rec_type} on {target} (priority: {priority})"
+
+            # Store in memory for tracking
+            self.memory.write(f"remediation_plan_{target}", {
+                "recommendation": recommendation,
+                "plan": plan_steps,
+                "status": "awaiting_review"
+            })
+
+            self.context.add_history('auto_remediate_completed', {
+                'target': target,
+                'type': rec_type,
+                'steps': len(plan_steps)
+            })
+            self.context.set_state('idle')
+
+            self.logger.info(f"Remediation plan created: {len(plan_steps)} steps for {target}")
+            return result
+
+        except Exception as e:
+            error_msg = f"Auto-remediation failed: {str(e)}"
+            self.logger.error(error_msg)
+            result["status"] = "error"
+            result["reason"] = error_msg
+            self.context.set_state('error')
+            return result
+
+    def _continuous_monitoring(
+        self,
+        config: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
-        TODO: Run continuous background monitoring.
-        
-        GATED: This feature requires explicit approval. When enabled,
-        it would periodically observe and analyze, alerting on issues.
-        
-        Currently a no-op stub.
+        Run a single iteration of continuous monitoring.
+
+        GATED: Requires `explicit_approval=True` in config.
+        Designed to be called periodically by an external scheduler
+        rather than running an internal loop.
+
+        Each iteration:
+        1. Takes a system snapshot
+        2. Analyzes for issues
+        3. Records health metrics
+        4. Returns alerts if thresholds are exceeded
+
+        Args:
+            config: Optional config overriding defaults. Keys:
+                - explicit_approval: bool (must be True)
+                - alert_threshold: float (default 0.5)
+                - max_consecutive_errors: int (default 3)
+
+        Returns:
+            Dictionary containing:
+            {
+                "monitoring_active": bool,
+                "alerts": List[Dict],
+                "health_score": float,
+                "issues_detected": int,
+                "status": str
+            }
         """
-        # TODO: Implement continuous monitoring loop
-        # REQUIRES: explicit_approval=True in config
-        # REQUIRES: rate limiting and circuit breakers
-        self.logger.warning("Continuous monitoring is disabled (batch mode only)")
-        pass
+        config = config or {}
+        result = {
+            "monitoring_active": False,
+            "alerts": [],
+            "health_score": 0.0,
+            "issues_detected": 0,
+            "status": "disabled"
+        }
+
+        # Gate check
+        if not config.get("explicit_approval", False):
+            self.logger.warning("Continuous monitoring requires explicit_approval=True in config")
+            result["status"] = "disabled"
+            return result
+
+        self.logger.info("Continuous monitoring iteration started")
+        self.context.set_state('monitoring')
+
+        alert_threshold = config.get("alert_threshold", 0.5)
+        max_errors = config.get("max_consecutive_errors", 3)
+
+        try:
+            # 1. Observe
+            observation = self.observe()
+
+            # 2. Analyze
+            analysis = self.analyze(observation)
+
+            # 3. Health score
+            health_score = self.health_metrics.get_health_score()
+            result["health_score"] = health_score
+            result["monitoring_active"] = True
+            result["status"] = "active"
+
+            # 4. Count issues
+            summary = analysis.get("summary", {})
+            issues_count = summary.get("total_issues", 0)
+            result["issues_detected"] = issues_count
+
+            # 5. Generate alerts based on thresholds
+            alerts = []
+
+            # Health score alert
+            if health_score < alert_threshold:
+                alerts.append({
+                    "type": "health_degradation",
+                    "severity": "high" if health_score < 0.3 else "medium",
+                    "message": f"System health score dropped to {health_score:.2f}",
+                    "threshold": alert_threshold,
+                    "value": health_score
+                })
+
+            # Issue count alert
+            if issues_count > 10:
+                alerts.append({
+                    "type": "issue_spike",
+                    "severity": "high" if issues_count > 25 else "medium",
+                    "message": f"Detected {issues_count} issues in analysis",
+                    "threshold": 10,
+                    "value": issues_count
+                })
+
+            # Error rate alert
+            metrics = observation.get("metrics", {})
+            error_rate = metrics.get("overall_failure_rate", 0.0)
+            if error_rate > 0.1:
+                alerts.append({
+                    "type": "error_rate",
+                    "severity": "critical" if error_rate > 0.3 else "high",
+                    "message": f"Agent failure rate at {error_rate:.1%}",
+                    "threshold": 0.1,
+                    "value": error_rate
+                })
+
+            result["alerts"] = alerts
+
+            # Record monitoring health indicator
+            self.health_metrics.record_indicator(
+                "monitoring_iteration",
+                1.0,  # success
+                unit="bool",
+                description="Monitoring iteration completed"
+            )
+
+            self.context.add_history('monitoring_iteration_completed', {
+                'health_score': health_score,
+                'issues': issues_count,
+                'alerts': len(alerts)
+            })
+            self.context.set_state('idle')
+
+            if alerts:
+                self.logger.warning(f"Monitoring: {len(alerts)} alerts raised")
+            else:
+                self.logger.info("Monitoring iteration complete — no alerts")
+
+            return result
+
+        except Exception as e:
+            error_msg = f"Monitoring iteration failed: {str(e)}"
+            self.logger.error(error_msg)
+            result["status"] = "error"
+
+            # Record failure for circuit breaker tracking
+            self.health_metrics.record_indicator(
+                "monitoring_iteration",
+                0.0,  # failure
+                unit="bool",
+                description="Monitoring iteration failed"
+            )
+
+            self.context.set_state('error')
+            return result
+

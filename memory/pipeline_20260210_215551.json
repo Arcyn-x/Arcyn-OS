@@ -1,0 +1,89 @@
+{
+  "goal": "Test goal",
+  "status": "completed",
+  "started_at": "2026-02-10T21:55:51.582760",
+  "completed_at": "2026-02-10T21:55:51.726314",
+  "total_duration_ms": 143.34368705749512,
+  "error": null,
+  "stages": [
+    {
+      "name": "classify",
+      "agent_id": "S-1",
+      "description": "Intent classification & routing",
+      "status": "completed",
+      "duration_ms": 0.0059604644775390625,
+      "started_at": "2026-02-10T21:55:51.582973",
+      "completed_at": "2026-02-10T21:55:51.582987",
+      "error": null
+    },
+    {
+      "name": "plan",
+      "agent_id": "A-1",
+      "description": "Goal \u2192 structured plan",
+      "status": "completed",
+      "duration_ms": 0.00476837158203125,
+      "started_at": "2026-02-10T21:55:51.582996",
+      "completed_at": "2026-02-10T21:55:51.583005",
+      "error": null
+    },
+    {
+      "name": "build",
+      "agent_id": "F-1",
+      "description": "Plan \u2192 code generation",
+      "status": "completed",
+      "duration_ms": 0.003814697265625,
+      "started_at": "2026-02-10T21:55:51.583011",
+      "completed_at": "2026-02-10T21:55:51.583018",
+      "error": null
+    },
+    {
+      "name": "validate",
+      "agent_id": "F-2",
+      "description": "Architectural validation",
+      "status": "completed",
+      "duration_ms": 0.00286102294921875,
+      "started_at": "2026-02-10T21:55:51.583024",
+      "completed_at": "2026-02-10T21:55:51.583030",
+      "error": null
+    },
+    {
+      "name": "integrate",
+      "agent_id": "F-3",
+      "description": "Compatibility & standards check",
+      "status": "completed",
+      "duration_ms": 0.0050067901611328125,
+      "started_at": "2026-02-10T21:55:51.583037",
+      "completed_at": "2026-02-10T21:55:51.583049",
+      "error": null
+    },
+    {
+      "name": "store",
+      "agent_id": "S-2",
+      "description": "Knowledge storage & indexing",
+      "status": "completed",
+      "duration_ms": 142.90571212768555,
+      "started_at": "2026-02-10T21:55:51.583063",
+      "completed_at": "2026-02-10T21:55:51.725983",
+      "error": null
+    },
+    {
+      "name": "review",
+      "agent_id": "S-3",
+      "description": "Strategic analysis & recommendations",
+      "status": "completed",
+      "duration_ms": 0.008821487426757812,
+      "started_at": "2026-02-10T21:55:51.726017",
+      "completed_at": "2026-02-10T21:55:51.726034",
+      "error": null
+    }
+  ],
+  "outputs": {
+    "classification": "{'intent': 'BUILD_REQUEST', 'goal': 'Test goal', 'confidence': 0.7, 'routing': {'target_agent': 'architect'}, 'assumptions': ['Treating as a build request'], 'missing_info': []}",
+    "plan": "{'goal': 'Test goal', 'tasks': [{'id': 'T1', 'name': 'Test goal', 'type': 'feature', 'effort': 'medium'}], 'milestones': [{'id': 'M1', 'name': 'MVP', 'tasks': ['T1']}], 'execution_order': ['T1'], 'warnings': ['Architect agent not available \u2014 minimal plan generated']}",
+    "build": "{'action': 'build', 'files_changed': [], 'summary': 'Builder agent not available', 'warnings': ['Builder agent not loaded'], 'task_results': []}",
+    "validation": "{'valid': True, 'errors': [], 'warnings': ['System Designer not available \u2014 validation skipped'], 'recommendations': []}",
+    "integration": "{'status': 'APPROVED', 'warnings': ['Integrator not available \u2014 auto-approved'], 'actions_required': [], 'validation_details': {}}",
+    "knowledge": "{'success': True, 'record_id': None, 'warnings': ['Knowledge Engine not available \u2014 stored to memory only']}",
+    "review": "{'risks': [], 'inefficiencies': [], 'suggested_changes': [], 'priority': 'low', 'confidence': 0.0, 'warnings': ['Evolution Agent not available \u2014 review skipped']}"
+  }
+}

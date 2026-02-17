@@ -273,3 +273,260 @@ __all__ = []
         
         return result
 
+    def add_class(self, file_path: str, class_code: str, position: Optional[int] = None) -> Dict[str, Any]:
+        """
+        Add a class to an existing file.
+
+        Args:
+            file_path: Path to the file
+            class_code: Complete class code (including class statement)
+            position: Optional line number to insert at (appends at end if None)
+
+        Returns:
+            Dictionary with result
+        """
+        result = {
+            "success": False,
+            "file_path": file_path,
+            "warnings": [],
+            "errors": []
+        }
+
+        # Read existing file
+        read_success, content, read_error = self.file_manager.read_file(file_path)
+        if not read_success:
+            result["errors"].append(read_error or "Failed to read file")
+            return result
+
+        # Check for duplicate class name
+        import re
+        class_match = re.search(r'class\s+(\w+)', class_code)
+        if class_match:
+            class_name = class_match.group(1)
+            if re.search(rf'class\s+{class_name}\b', content):
+                result["errors"].append(f"Class '{class_name}' already exists in {file_path}")
+                return result
+
+        # Insert class
+        lines = content.split('\n')
+
+        if position is None:
+            lines.append('')
+            lines.append('')
+            lines.append(class_code)
+        else:
+            lines.insert(position, class_code)
+
+        new_content = '\n'.join(lines)
+
+        # Write back
+        write_success, backup_path, write_error = self.file_manager.write_file(
+            file_path, new_content, create_backup=True
+        )
+
+        if not write_success:
+            result["errors"].append(write_error or "Failed to write file")
+            return result
+
+        result["success"] = True
+        result["backup_path"] = backup_path
+
+        # Validate
+        validation = self.validator.validate_file(file_path)
+        if not validation["overall_valid"]:
+            result["warnings"].extend(validation.get("syntax_errors", []))
+            result["warnings"].extend(validation.get("structure_warnings", []))
+
+        return result
+
+    def add_import(self, file_path: str, import_statement: str) -> Dict[str, Any]:
+        """
+        Add an import statement to a file (idempotent — skips duplicates).
+
+        The import is inserted after existing imports or at the top of the file.
+
+        Args:
+            file_path: Path to the file
+            import_statement: Complete import statement (e.g., "from typing import Dict")
+
+        Returns:
+            Dictionary with result
+        """
+        result = {
+            "success": False,
+            "file_path": file_path,
+            "warnings": [],
+            "errors": []
+        }
+
+        # Read existing file
+        read_success, content, read_error = self.file_manager.read_file(file_path)
+        if not read_success:
+            result["errors"].append(read_error or "Failed to read file")
+            return result
+
+        import_line = import_statement.strip()
+
+        # Check for duplicate import
+        existing_lines = content.split('\n')
+        for line in existing_lines:
+            if line.strip() == import_line:
+                result["success"] = True
+                result["warnings"].append(f"Import already exists: {import_line}")
+                return result
+
+        # Find the last import line to insert after it
+        last_import_idx = -1
+        for i, line in enumerate(existing_lines):
+            stripped = line.strip()
+            if stripped.startswith('import ') or stripped.startswith('from '):
+                last_import_idx = i
+
+        if last_import_idx >= 0:
+            existing_lines.insert(last_import_idx + 1, import_line)
+        else:
+            # No imports found — insert after docstring or at top
+            insert_at = 0
+            in_docstring = False
+            for i, line in enumerate(existing_lines):
+                stripped = line.strip()
+                if stripped.startswith('"""') or stripped.startswith("'''"):
+                    if in_docstring:
+                        insert_at = i + 1
+                        break
+                    else:
+                        # Single-line docstring
+                        count = stripped.count('"""') + stripped.count("'''")
+                        if count >= 2:
+                            insert_at = i + 1
+                            break
+                        in_docstring = True
+                elif in_docstring:
+                    continue
+                else:
+                    insert_at = i
+                    break
+
+            existing_lines.insert(insert_at, import_line)
+
+        new_content = '\n'.join(existing_lines)
+
+        # Write back
+        write_success, backup_path, write_error = self.file_manager.write_file(
+            file_path, new_content, create_backup=True
+        )
+
+        if not write_success:
+            result["errors"].append(write_error or "Failed to write file")
+            return result
+
+        result["success"] = True
+        result["backup_path"] = backup_path
+        return result
+
+    def generate_from_spec(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate a Python file from a structured specification.
+
+        Args:
+            spec: Dictionary with file specification:
+                {
+                    "file_path": str,
+                    "module_docstring": str,
+                    "imports": List[str],
+                    "classes": List[{
+                        "name": str,
+                        "docstring": str,
+                        "bases": List[str],
+                        "methods": List[{
+                            "name": str,
+                            "args": str,
+                            "docstring": str,
+                            "body": str
+                        }]
+                    }],
+                    "functions": List[{
+                        "name": str,
+                        "args": str,
+                        "return_type": str,
+                        "docstring": str,
+                        "body": str
+                    }],
+                    "overwrite": bool
+                }
+
+        Returns:
+            Dictionary with result (same format as create_file)
+        """
+        file_path = spec.get("file_path", "")
+        if not file_path:
+            return {"success": False, "errors": ["file_path is required in spec"]}
+
+        lines: List[str] = []
+
+        # Module docstring
+        docstring = spec.get("module_docstring", "")
+        if docstring:
+            lines.append(f'"""\n{docstring}\n"""')
+            lines.append("")
+
+        # Imports
+        imports = spec.get("imports", [])
+        for imp in imports:
+            lines.append(imp)
+        if imports:
+            lines.append("")
+            lines.append("")
+
+        # Functions
+        for func in spec.get("functions", []):
+            name = func.get("name", "untitled")
+            args = func.get("args", "")
+            return_type = func.get("return_type", "")
+            func_docstring = func.get("docstring", "")
+            body = func.get("body", "pass")
+
+            ret = f" -> {return_type}" if return_type else ""
+            lines.append(f"def {name}({args}){ret}:")
+            if func_docstring:
+                lines.append(f'    """{func_docstring}"""')
+            for body_line in body.split('\n'):
+                lines.append(f"    {body_line}")
+            lines.append("")
+            lines.append("")
+
+        # Classes
+        for cls in spec.get("classes", []):
+            cls_name = cls.get("name", "Untitled")
+            bases = cls.get("bases", [])
+            cls_docstring = cls.get("docstring", "")
+            methods = cls.get("methods", [])
+
+            bases_str = f"({', '.join(bases)})" if bases else ""
+            lines.append(f"class {cls_name}{bases_str}:")
+            if cls_docstring:
+                lines.append(f'    """{cls_docstring}"""')
+            lines.append("")
+
+            if not methods:
+                lines.append("    pass")
+            else:
+                for method in methods:
+                    m_name = method.get("name", "method")
+                    m_args = method.get("args", "self")
+                    m_docstring = method.get("docstring", "")
+                    m_body = method.get("body", "pass")
+
+                    lines.append(f"    def {m_name}({m_args}):")
+                    if m_docstring:
+                        lines.append(f'        """{m_docstring}"""')
+                    for body_line in m_body.split('\n'):
+                        lines.append(f"        {body_line}")
+                    lines.append("")
+
+            lines.append("")
+
+        content = '\n'.join(lines)
+        overwrite = spec.get("overwrite", False)
+
+        return self.create_file(file_path, content, overwrite=overwrite)

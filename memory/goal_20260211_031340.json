@@ -1,0 +1,5 @@
+{
+  "goal": "Simple test",
+  "plan": "{'goal': 'Simple test', 'tasks': [{'id': 'T1', 'name': 'Simple test', 'type': 'feature', 'effort': 'medium'}], 'milestones': [{'id': 'M1', 'name': 'MVP', 'tasks': ['T1']}], 'execution_order': ['T1'], 'warnings': ['Architect agent not available \u2014 minimal plan generated'], '_stage': <core.orchestrator.PipelineStage object at 0x00000153CAEF0D70>}",
+  "status": "APPROVED"
+}

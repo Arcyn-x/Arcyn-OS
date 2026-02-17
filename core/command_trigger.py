@@ -34,7 +34,7 @@ Future Integration Points:
 
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -140,6 +140,176 @@ def trigger(command: str) -> str:
         >>> print(output)
     """
     return get_trigger().execute(command)
+
+
+# =============================================================================
+# Integration Hooks
+# =============================================================================
+
+class WebhookTrigger:
+    """
+    Integration hook for external trigger sources.
+
+    Wraps the CommandTrigger with source-specific metadata and
+    structured JSON responses for programmatic consumers.
+
+    Supported sources:
+        - Voice transcription (speech-to-text output)
+        - UI button actions (button_id → command mapping)
+        - Webhook payloads (POST /webhook/command)
+        - Chat bot messages (Slack, Discord, etc.)
+
+    Example:
+        >>> hook = WebhookTrigger()
+        >>> result = hook.from_webhook({"command": "system status", "source": "slack"})
+        >>> print(result["output"])
+    """
+
+    def __init__(self):
+        """Initialize the webhook trigger."""
+        self._trigger = get_trigger()
+        self._button_map: Dict[str, str] = {
+            "btn_status": "system status",
+            "btn_architecture": "explain architecture",
+            "btn_loop_test": "full arcyn os loop test",
+            "btn_evolution": "run evolution cycle",
+            "btn_help": "help",
+        }
+
+    def from_voice(self, transcription: str) -> Dict[str, Any]:
+        """
+        Process a voice transcription.
+
+        Args:
+            transcription: Transcribed text from speech-to-text
+
+        Returns:
+            Structured result with output and metadata
+        """
+        cleaned = transcription.strip()
+        if not cleaned:
+            return {
+                "success": False,
+                "source": "voice",
+                "error": "Empty transcription",
+                "output": ""
+            }
+
+        output = self._trigger.execute(cleaned)
+        return {
+            "success": True,
+            "source": "voice",
+            "input": cleaned,
+            "intent": self._trigger.get_intent(cleaned),
+            "output": output
+        }
+
+    def from_ui_button(self, button_id: str) -> Dict[str, Any]:
+        """
+        Process a UI button click.
+
+        Args:
+            button_id: Identifier of the button clicked
+
+        Returns:
+            Structured result with output and metadata
+        """
+        command = self._button_map.get(button_id)
+        if not command:
+            return {
+                "success": False,
+                "source": "ui",
+                "error": f"Unknown button: {button_id}",
+                "available_buttons": list(self._button_map.keys()),
+                "output": ""
+            }
+
+        output = self._trigger.execute(command)
+        return {
+            "success": True,
+            "source": "ui",
+            "button_id": button_id,
+            "command": command,
+            "output": output
+        }
+
+    def from_webhook(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Process a webhook payload.
+
+        Expected payload format:
+            {
+                "command": str,           # Required — the command to execute
+                "source": str,            # Optional — source identifier
+                "callback_url": str       # Optional — URL for async response
+            }
+
+        Args:
+            payload: Webhook payload dictionary
+
+        Returns:
+            Structured result with output and metadata
+        """
+        command = payload.get("command", "").strip()
+        source = payload.get("source", "webhook")
+
+        if not command:
+            return {
+                "success": False,
+                "source": source,
+                "error": "Missing 'command' in payload",
+                "output": ""
+            }
+
+        output = self._trigger.execute(command)
+        return {
+            "success": True,
+            "source": source,
+            "command": command,
+            "intent": self._trigger.get_intent(command),
+            "output": output
+        }
+
+    def from_chat_bot(self, message: str, platform: str = "generic") -> Dict[str, Any]:
+        """
+        Process a chat bot message (Slack, Discord, etc.).
+
+        Args:
+            message: Message text from the bot
+            platform: Platform identifier (e.g., "slack", "discord")
+
+        Returns:
+            Structured result with output and metadata
+        """
+        # Strip bot mentions (e.g., @arcyn, /arcyn)
+        import re
+        cleaned = re.sub(r'^[@/]?\s*arcyn\s*', '', message, flags=re.IGNORECASE).strip()
+        if not cleaned:
+            return {
+                "success": False,
+                "source": platform,
+                "error": "Empty message after stripping bot mention",
+                "output": ""
+            }
+
+        output = self._trigger.execute(cleaned)
+        return {
+            "success": True,
+            "source": platform,
+            "input": cleaned,
+            "intent": self._trigger.get_intent(cleaned),
+            "output": output
+        }
+
+    def register_button(self, button_id: str, command: str) -> None:
+        """
+        Register a UI button mapping.
+
+        Args:
+            button_id: Button identifier
+            command: Command string to execute when clicked
+        """
+        self._button_map[button_id] = command
 
 
 # =============================================================================

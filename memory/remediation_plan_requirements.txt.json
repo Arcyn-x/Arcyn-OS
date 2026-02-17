@@ -1,0 +1,29 @@
+{
+  "recommendation": {
+    "type": "upgrade",
+    "target": "requirements.txt",
+    "description": "Upgrade google-genai to 2.0",
+    "priority": "medium"
+  },
+  "plan": [
+    {
+      "step": 1,
+      "action": "compatibility_check",
+      "description": "Check upgrade compatibility for requirements.txt",
+      "reversible": true
+    },
+    {
+      "step": 2,
+      "action": "generate_migration",
+      "description": "Generate migration plan: Upgrade google-genai to 2.0",
+      "reversible": true
+    },
+    {
+      "step": 3,
+      "action": "queue_for_review",
+      "description": "Submit migration for human review",
+      "reversible": true
+    }
+  ],
+  "status": "awaiting_review"
+}

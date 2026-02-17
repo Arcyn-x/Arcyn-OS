@@ -1,15 +1,330 @@
 {
-  "nodes": [],
-  "edges": [],
+  "version": "1.0.0",
+  "generated_at": "2026-02-10T20:43:00Z",
+  "nodes": [
+    {
+      "id": "core.memory",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.logger",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.context_manager",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.command_trigger",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.intent_router",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.dispatcher",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.llm_provider",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.orchestrator",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.llm_gateway.gateway",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.llm_gateway.policy",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.llm_gateway.rate_limiter",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.llm_gateway.cost_tracker",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "core.llm_gateway.providers.gemini",
+      "type": "module",
+      "layer": "core"
+    },
+    {
+      "id": "agents.persona",
+      "type": "agent",
+      "layer": "agents",
+      "agent_id": "S-1"
+    },
+    {
+      "id": "agents.architect",
+      "type": "agent",
+      "layer": "agents",
+      "agent_id": "A-1"
+    },
+    {
+      "id": "agents.builder",
+      "type": "agent",
+      "layer": "agents",
+      "agent_id": "F-1"
+    },
+    {
+      "id": "agents.system_designer",
+      "type": "agent",
+      "layer": "agents",
+      "agent_id": "F-2"
+    },
+    {
+      "id": "agents.integrator",
+      "type": "agent",
+      "layer": "agents",
+      "agent_id": "F-3"
+    },
+    {
+      "id": "agents.knowledge_engine",
+      "type": "agent",
+      "layer": "agents",
+      "agent_id": "S-2"
+    },
+    {
+      "id": "agents.evolution",
+      "type": "agent",
+      "layer": "agents",
+      "agent_id": "S-3"
+    },
+    {
+      "id": "api.server",
+      "type": "module",
+      "layer": "interfaces"
+    }
+  ],
+  "edges": [
+    {
+      "from": "core.orchestrator",
+      "to": "agents.persona",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "agents.architect",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "agents.builder",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "agents.system_designer",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "agents.integrator",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "agents.knowledge_engine",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "agents.evolution",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "core.logger",
+      "type": "imports"
+    },
+    {
+      "from": "core.orchestrator",
+      "to": "core.context_manager",
+      "type": "imports"
+    },
+    {
+      "from": "core.command_trigger",
+      "to": "core.intent_router",
+      "type": "imports"
+    },
+    {
+      "from": "core.command_trigger",
+      "to": "core.dispatcher",
+      "type": "imports"
+    },
+    {
+      "from": "core.dispatcher",
+      "to": "core.llm_provider",
+      "type": "imports"
+    },
+    {
+      "from": "core.context_manager",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "agents.persona",
+      "to": "core.logger",
+      "type": "imports"
+    },
+    {
+      "from": "agents.persona",
+      "to": "core.context_manager",
+      "type": "imports"
+    },
+    {
+      "from": "agents.persona",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "agents.architect",
+      "to": "core.logger",
+      "type": "imports"
+    },
+    {
+      "from": "agents.architect",
+      "to": "core.context_manager",
+      "type": "imports"
+    },
+    {
+      "from": "agents.architect",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "agents.builder",
+      "to": "core.logger",
+      "type": "imports"
+    },
+    {
+      "from": "agents.builder",
+      "to": "core.context_manager",
+      "type": "imports"
+    },
+    {
+      "from": "agents.builder",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "agents.system_designer",
+      "to": "core.logger",
+      "type": "imports"
+    },
+    {
+      "from": "agents.system_designer",
+      "to": "core.context_manager",
+      "type": "imports"
+    },
+    {
+      "from": "agents.system_designer",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "agents.integrator",
+      "to": "core.logger",
+      "type": "imports"
+    },
+    {
+      "from": "agents.integrator",
+      "to": "core.context_manager",
+      "type": "imports"
+    },
+    {
+      "from": "agents.integrator",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "agents.knowledge_engine",
+      "to": "core.logger",
+      "type": "imports"
+    },
+    {
+      "from": "agents.knowledge_engine",
+      "to": "core.context_manager",
+      "type": "imports"
+    },
+    {
+      "from": "agents.knowledge_engine",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "agents.evolution",
+      "to": "core.logger",
+      "type": "imports"
+    },
+    {
+      "from": "agents.evolution",
+      "to": "core.context_manager",
+      "type": "imports"
+    },
+    {
+      "from": "agents.evolution",
+      "to": "core.memory",
+      "type": "imports"
+    },
+    {
+      "from": "core.llm_gateway.gateway",
+      "to": "core.llm_gateway.policy",
+      "type": "imports"
+    },
+    {
+      "from": "core.llm_gateway.gateway",
+      "to": "core.llm_gateway.rate_limiter",
+      "type": "imports"
+    },
+    {
+      "from": "core.llm_gateway.gateway",
+      "to": "core.llm_gateway.cost_tracker",
+      "type": "imports"
+    },
+    {
+      "from": "core.llm_gateway.gateway",
+      "to": "core.llm_gateway.providers.gemini",
+      "type": "imports"
+    },
+    {
+      "from": "api.server",
+      "to": "core.orchestrator",
+      "type": "imports"
+    }
+  ],
   "metadata": {
-    "total_modules": 0,
-    "total_dependencies": 0,
-    "has_circular_dependencies": false
-  },
-  "circular_dependencies": [],
-  "layer_validation": {
-    "valid": true,
-    "violations": []
-  },
-  "topological_order": []
+    "total_modules": 21,
+    "total_dependencies": 40,
+    "circular_dependencies": [],
+    "layers": {
+      "core": 13,
+      "agents": 7,
+      "interfaces": 1
+    }
+  }
 }

@@ -44,8 +44,8 @@ class Logger:
             datefmt='%Y-%m-%d %H:%M:%S'
         )
         
-        # Console handler
-        console_handler = logging.StreamHandler(sys.stdout)
+        # Console handler (stderr to avoid mixing with program output)
+        console_handler = logging.StreamHandler(sys.stderr)
         console_handler.setLevel(log_level)
         console_handler.setFormatter(formatter)
         self.logger.addHandler(console_handler)

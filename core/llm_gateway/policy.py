@@ -291,10 +291,25 @@ class PolicyEngine:
         """Get policy with agent-specific overrides applied."""
         if agent not in self._agent_overrides:
             return self.policy
-        
-        # Clone policy and apply overrides
-        # TODO: Implement proper override merging
-        return self.policy
+
+        overrides = self._agent_overrides[agent]
+
+        # Build a dict of the base policy's fields, then overlay overrides
+        from dataclasses import fields as dc_fields
+        valid_field_names = {f.name for f in dc_fields(Policy)}
+
+        # Filter overrides to only valid Policy fields
+        merged = {}
+        for key, value in overrides.items():
+            if key in valid_field_names:
+                merged[key] = value
+
+        if not merged:
+            return self.policy
+
+        # Use dataclasses.replace to create a new Policy with overrides
+        from dataclasses import replace as dc_replace
+        return dc_replace(self.policy, **merged)
     
     def _is_agent_authorized(self, agent: str, policy: Policy) -> bool:
         """Check if agent is authorized."""

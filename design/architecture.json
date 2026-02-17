@@ -1,10 +1,10 @@
 {
-  "goal": "Design Arcyn OS memory system",
+  "goal": "Arcyn OS — AI-First Multi-Agent Operating System",
   "version": "1.0.0",
   "layers": {
     "core": {
       "name": "Core Layer",
-      "description": "Foundation system modules (memory, logging, context)",
+      "description": "Foundation system modules (memory, logging, context, orchestration, LLM gateway)",
       "dependencies": [],
       "allowed_dependencies": [],
       "scalability": "high",
@@ -12,7 +12,7 @@
     },
     "agents": {
       "name": "Agents Layer",
-      "description": "AI agent implementations",
+      "description": "Seven AI agents: Persona, Architect, Builder, System Designer, Integrator, Knowledge Engine, Evolution",
       "dependencies": [
         "core"
       ],
@@ -24,7 +24,7 @@
     },
     "interfaces": {
       "name": "Interfaces Layer",
-      "description": "Agent-to-agent and external interfaces",
+      "description": "REST API, CLI, and external integration points",
       "dependencies": [
         "core",
         "agents"
@@ -38,7 +38,7 @@
     },
     "design": {
       "name": "Design Layer",
-      "description": "Architecture and design artifacts",
+      "description": "Architecture and design artifacts (JSON schemas, dependency graphs)",
       "dependencies": [],
       "allowed_dependencies": [],
       "scalability": "unlimited",
@@ -49,21 +49,100 @@
     {
       "name": "memory",
       "layer": "core",
-      "description": "Memory management system",
-      "dependencies": []
+      "description": "SQLite-backed persistent memory with in-memory cache, namespace isolation, TTL, and search"
+    },
+    {
+      "name": "logger",
+      "layer": "core",
+      "description": "Structured logging with per-agent loggers and file output"
+    },
+    {
+      "name": "context_manager",
+      "layer": "core",
+      "description": "Agent state, session data, versioning, and inter-agent context sharing via shared bus"
+    },
+    {
+      "name": "orchestrator",
+      "layer": "core",
+      "description": "Pipeline orchestrator wiring 7 agents into sequential execution flow"
+    },
+    {
+      "name": "command_trigger",
+      "layer": "core",
+      "description": "CLI-style command parsing and routing via intent classification"
+    },
+    {
+      "name": "intent_router",
+      "layer": "core",
+      "description": "Rule-based intent classification for user input"
+    },
+    {
+      "name": "dispatcher",
+      "layer": "core",
+      "description": "Routes classified intents to appropriate agent handlers"
+    },
+    {
+      "name": "llm_provider",
+      "layer": "core",
+      "description": "Direct Gemini API integration with completion, structured output, and embeddings"
+    },
+    {
+      "name": "llm_gateway",
+      "layer": "core",
+      "description": "Full-featured LLM gateway with policy engine, rate limiting, cost tracking, and provider abstraction"
     }
   ],
-  "interfaces": [],
+  "interfaces": [
+    {
+      "name": "REST API",
+      "type": "http",
+      "module": "api.server",
+      "description": "FastAPI REST server exposing pipeline execution, classification, planning, memory, and health endpoints",
+      "endpoints": [
+        "POST /api/execute",
+        "POST /api/classify",
+        "POST /api/plan",
+        "POST /api/command",
+        "GET /api/status",
+        "GET /api/health",
+        "GET /api/memory/search",
+        "GET /api/memory/stats"
+      ]
+    },
+    {
+      "name": "CLI",
+      "type": "cli",
+      "module": "main",
+      "description": "Command-line interface with interactive mode, goal execution, status, and Evolution Agent access"
+    },
+    {
+      "name": "Orchestrator Pipeline",
+      "type": "internal",
+      "module": "core.orchestrator",
+      "description": "Internal pipeline interface: Persona → Architect → Builder → SystemDesigner → Integrator → Knowledge → Evolution"
+    },
+    {
+      "name": "Context Bus",
+      "type": "internal",
+      "module": "core.context_manager",
+      "description": "Shared context bus for inter-agent publish/subscribe communication"
+    }
+  ],
   "scalability_boundaries": [
     {
       "boundary": "agent_isolation",
-      "description": "Agents operate in isolated contexts",
+      "description": "Agents operate in isolated contexts with shared bus for coordination",
       "scalability": "horizontal"
     },
     {
       "boundary": "core_singleton",
-      "description": "Core modules are singleton instances",
+      "description": "Core modules (Memory, Logger) are shared instances",
       "scalability": "vertical"
+    },
+    {
+      "boundary": "llm_gateway",
+      "description": "LLM gateway provides rate limiting and cost control for API calls",
+      "scalability": "controlled"
     }
   ],
   "upgrade_paths": {
@@ -72,9 +151,15 @@
       "version_strategy": "semantic_versioning"
     },
     "versioned": {
-      "description": "Versioned interfaces",
+      "description": "Versioned interfaces with deprecation support",
       "version_strategy": "major_version"
     }
   },
-  "constraints": []
+  "constraints": [
+    "Agents must not access LLM directly — use LLM Gateway",
+    "Builder Agent never writes code without Architect instruction",
+    "Evolution Agent is advisory-only by default",
+    "Integrator validates but does not create",
+    "All LLM requests subject to policy enforcement"
+  ]
 }

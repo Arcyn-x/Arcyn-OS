@@ -1,0 +1,23 @@
+{
+  "recommendation": {
+    "type": "custom_action",
+    "target": "anywhere",
+    "description": "Something unusual",
+    "priority": "low"
+  },
+  "plan": [
+    {
+      "step": 1,
+      "action": "evaluate",
+      "description": "Evaluate recommendation: Something unusual",
+      "reversible": true
+    },
+    {
+      "step": 2,
+      "action": "queue_for_review",
+      "description": "Submit evaluation for human review",
+      "reversible": true
+    }
+  ],
+  "status": "awaiting_review"
+}
